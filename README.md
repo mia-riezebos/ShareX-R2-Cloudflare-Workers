@@ -10,24 +10,38 @@ For a video walkthrough on how to set everything up, including the Worker, R2, a
 https://watch.videodelivery.net/3fb9e86deffbd4351b9187db92136ef5
 
 
+## mia.cx deployment
+
+This fork deploys the `sharex-r2-upload` Worker to `i.mia.cx` and binds the
+Worker variable `R2_BUCKET` to the `i-mia-cx` R2 bucket. R2 bucket names cannot
+contain dots, so the bucket uses hyphens while the public hostname retains the
+desired dotted name.
+
+Pushes to `main` run linting, type checks, tests, a Wrangler dry run, and then a
+production deployment. The workflow can also be run manually. It requires
+these GitHub Actions secrets:
+
+- `CLOUDFLARE_ACCOUNT_ID`
+- `CLOUDFLARE_API_TOKEN`
+- `AUTH_KEY`
+
+The Cloudflare token should be scoped to the `mia.cx` account and zone with
+Workers Scripts Edit, Workers R2 Storage Edit, and Workers Routes Edit.
+
 ## Worker and R2 Setup
 
 - Ensure you have wrangler installed and configured. See [here](https://developers.cloudflare.com/workers/get-started/guide/) for more details
 - Clone repo (or fork?), and run `npm ci` to install dependencies
 - Choose a bucket name to use in the next steps. For the purpose of this example, I'll be using `sharex-files`
-- Edit `wrangler.toml` with your `account_id`, `route`, and `r2_buckets.bucket_name`
+- Edit `wrangler.jsonc` with your `account_id`, route, and `r2_buckets.bucket_name`
 - Run `wrangler r2 bucket create <bucket name>`
 - Generate a random string of characters - this will be used for an `AUTH_KEY` header that we'll send along with ShareX
 	- This ensures that only you can upload to your script
 - In your GitHub repository, create an `AUTH_KEY` secret, and set its value to the `AUTH_KEY` you just generated
 	- This will be used by the GitHub Action to deploy the worker
-- In your GitHub repository, create a `CF_API_TOKEN` secret, and set its value to a Cloudflare API token with the following permissions:
+- In your GitHub repository, create a `CLOUDFLARE_API_TOKEN` secret, and set its value to a Cloudflare API token with the following permissions:
 	- Account - Workers R2 Storage - Edit
-	- Account - Workers Tail - Read
-	- Account - Workers KV Storage - Edit
 	- Account - Workers Scripts - Edit
-	- Account - Account Settings - Read
-	- User - User Details - Read
 	- Zone - Workers Routes - Edit
 
 	- Then be sure to give it access to the application account/zone resources you want to use
