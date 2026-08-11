@@ -25,8 +25,9 @@ these GitHub Actions secrets:
 - `CLOUDFLARE_API_TOKEN`
 - `AUTH_KEY`
 
-The Cloudflare token should be scoped to the `mia.cx` account and zone with
-Workers Scripts Edit, Workers R2 Storage Edit, and Workers Routes Edit.
+The Cloudflare token only needs `Account - Workers Scripts - Edit`, restricted
+to the `mia.cx` account. The bucket and custom domain already exist, so CI does
+not need R2 or zone-level permissions.
 
 ## Worker and R2 Setup
 
@@ -40,11 +41,9 @@ Workers Scripts Edit, Workers R2 Storage Edit, and Workers Routes Edit.
 - In your GitHub repository, create an `AUTH_KEY` secret, and set its value to the `AUTH_KEY` you just generated
 	- This will be used by the GitHub Action to deploy the worker
 - In your GitHub repository, create a `CLOUDFLARE_API_TOKEN` secret, and set its value to a Cloudflare API token with the following permissions:
-	- Account - Workers R2 Storage - Edit
 	- Account - Workers Scripts - Edit
-	- Zone - Workers Routes - Edit
-
-	- Then be sure to give it access to the application account/zone resources you want to use
+	- Restrict the token to the account containing the Worker
+	- Add Account - Workers R2 Storage - Edit only if CI will also create or manage R2 buckets
 ![Cloudflare API token for Wrangler R2 access](https://r2-sharex.jross.me/file/2022/03/f8a40b17-9005-4645-9fdb-1803085308d0.png)
 
 - If using GitHub Actions (like this repo), simply push your changes and the worker will be automatically deployed - see your Actions log for any errors.
